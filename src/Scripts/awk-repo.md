@@ -39,6 +39,6 @@ END {
         avg_sp_def = total_sp_def[type] / count[type];
         avg_speed = total_speed[type] / count[type];
 
-        printf "%s: Average Attack: %.2f, Average Defense: %.2f, Average Sp. Atk: %.2f, Average Sp. Def: %.2f, Average Speed: %.2f\n", type, avg_attack, avg_defense, avg_sp_atk, avg_sp_def, avg_speed;
+   printf "%s: Average Attack: %.2f, Average Defense: %.2f, Average Sp. Atk: %.2f, Average Sp. Def: %.2f, Average Speed: %.2f\n", type, avg_attack, avg_defense, avg_sp_atk, avg_sp_def, avg_speed;
     }
 }' pokemon.csv
