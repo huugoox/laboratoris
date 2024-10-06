@@ -21,7 +21,6 @@ awk -F ',' '
 NR > 1 {  
     type = $3;  
     
-    # Sumar las estadísticas por tipo
     total_attack[type] += $6;     
     total_defense[type] += $7;   
     total_sp_atk[type] += $8;     
