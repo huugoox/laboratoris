@@ -29,9 +29,9 @@
 
      - Dependències i condicions.
 
-    Aquest servei té dues dependències: network.target i sshd-keygen.service.
+     Aquest servei té dues dependències: network.target i sshd-keygen.service.
 
-    Com a condicions trobem que el servei només s'iniciarà si les condicions de xarxa es compleixen i que aquest ha d'estar habilitat per arrencar automàticament si es vol accedir al servidor SSH en iniciar el sistema.
+     Com a condicions trobem que el servei només s'iniciarà si les condicions de xarxa es compleixen i que aquest ha d'estar habilitat per arrencar automàticament si es vol accedir al servidor SSH en iniciar el sistema.
     
 
      - Tipus de servei i comandaments d'inici i parada.
@@ -46,3 +46,30 @@
      - Temps d'execució i estat actual.
 
      Com es pot veure en imatge el temps d'execució es de 57 minuts i el seu estat actual és running.
+
+
+
+2. **Comparació entre arrencada amb i sense interfície gràfica**
+   - Instal·la la interfície gràfica utilitzant la comanda `tasksel` i selecciona l'opció `Debian desktop environment`.
+
+   ![alt text](image-2.png)
+
+   ![alt text](image-3.png)
+
+
+   - Compara el temps d'arrencada del sistema amb i sense interfície gràfica utilitzant la comanda `systemd-analyze`.
+   - Inclou al informe de la diferència entre arrencar el sistema amb una interfície gràfica i sense interfície gràfica, incloent:
+     - Temps d'arrencada del kernel i l'espai d'usuari.
+     - Unitats crítiques i temps d'arrencada.
+     - Avantatges i desavantatges de cada configuració
+
+
+
+3. **Dissenyeu un escenari real on un script d'arrancada podria ser útil**
+   - Pensa en un escenari real on un script d'arrancada podria ser útil per configurar l'entorn de l'usuari.
+   - Crea un script d'arrancada que realitzi una tasca específica en aquest escenari.
+   - Configura el script d'arrancada perquè s'executi automàticament quan un usuari inicia una sessió de terminal.
+   - Inclou a l'informe amb els detalls de l'escenari i el script d'arrancada, incloent:
+     - Descripció de l'escenari i la tasca a realitzar.
+     - Contingut del script d'arrancada.
+     - Configuració del script d'arrancada per a l'usuari.
