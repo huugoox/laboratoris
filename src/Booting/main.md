@@ -28,7 +28,7 @@ Quan arranquem un ordinador, tenen lloc una sèrie de processos que permeten que
 
 ![Etapes de l'arrancada en un sistema linux](figures/linux-unix-booting-process.png)
 
-En aquest laboratori veurem totes aquestes fases en una màquina virtual i modificarem els parametres per veure com afecten als sistemes.
+En aquest laboratori veurem totes aquestes fases en una màquina virtual i modificarem els paràmetres per veure com afecten als sistemes.
 
 ## Objectius
 
