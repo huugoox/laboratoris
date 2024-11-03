@@ -66,7 +66,7 @@ apt install fio -y
     fio --name=write-raid1 --ioengine=libaio --iodepth=32 --rw=write \
     --bs=4k --size=500M --numjobs=4 --runtime=120 --time_based \
     --ramp_time=15 --group_reporting --filename=/dev/raid1 \
-    --output-format=json --output=/tmp/write-raid1.json
+    --output-format=json --output=/tmp/write-raid0.json
     ```
 
 2. Test de rendiment del RAID0 en operacions de lectura:
