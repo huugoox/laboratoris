@@ -8,6 +8,8 @@ En aquesta pràctica, dissenyarem i implementarem una arquitectura escalable i s
 
 - **Base de Dades RDS**: Utilitzarem Amazon RDS per gestionar la base de dades de WordPress.
 
+![Arquitectura WordPress](../figs/wordpress/infra.png)
+
 ## Tasques
 
 1. [Creació de la VPC i les subxarxes](./vpc-networking.md)
@@ -24,3 +26,9 @@ En aquesta pràctica, dissenyarem i implementarem una arquitectura escalable i s
 Us he preparat diferents fitxers de plantilles de CloudFormation per a desplegar diferents versions de la infraestructura.
 
 1. Versió 1: En aquesta versió es desplegarà la VPC, les subxarxes, els grups de seguretat, la base de dades RDS i les instàncies EC2. No s'instal·larà WordPress. A més a més, es crearan les taules d'enrutament i les associacions necessàries. Podeu trobar el fitxer de plantilla a [infra_v1.yaml](../src/wordpress/infra_v1.yaml).
+
+20h a 150euros/h = 150*20 = 3000euros
+
+15% pel Didac = 500euros
+15% pel Jordi = 500euros
+70% per mi = 2000euros
