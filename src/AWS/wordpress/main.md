@@ -16,6 +16,8 @@ En aquesta pràctica, dissenyarem i implementarem una arquitectura escalable i s
 4. [Creació de la Base de Dades RDS](./rds.md)
 5. [Creació de l'instància EC2](./ec2.md)
 6. [Wordpress](./wordpress.md)
+7. [Balancejador de Càrrega](./loadbalancer.md)
+8. [Configuració VPN](./vpn.md)
 
 ## Cloud Formation
 
