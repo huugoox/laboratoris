@@ -61,6 +61,10 @@
   - [Gestió de fallades](./LVM/failures.md)
   - [Snapshots](./LVM/snapshots.md)
   - [Mirroring](./LVM/mirroring.md)
+
+# Gestió de comptes
+
+- [Lord of the system](./Accounts/lord.md)
   
 # Servidors
 
@@ -86,3 +90,5 @@
     - [Creació de la Base de Dades RDS](./AWS/wordpress/rds.md)
     - [Creació de l'instància EC2](./AWS/wordpress/ec2.md)
     - [Wordpress](./AWS/wordpress/wordpress.md)
+    - [Balancejador de càrrega](./AWS/wordpress/loadbalancer.md)
+    - [Configuració VPN](./AWS/wordpress/vpn.md)
