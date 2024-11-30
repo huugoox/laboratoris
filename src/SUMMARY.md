@@ -61,10 +61,6 @@
   - [Gestió de fallades](./LVM/failures.md)
   - [Snapshots](./LVM/snapshots.md)
   - [Mirroring](./LVM/mirroring.md)
-
-# Gestió de comptes
-
-- [Lord of the system](./Accounts/lord.md)
   
 # Servidors
 
