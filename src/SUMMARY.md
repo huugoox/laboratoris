@@ -61,7 +61,12 @@
   - [Gestió de fallades](./LVM/failures.md)
   - [Snapshots](./LVM/snapshots.md)
   - [Mirroring](./LVM/mirroring.md)
-  
+
+# Gestió de comptes
+
+- [Lord of the system](./Accounts/lord.md)
+- [LDAP](./Accounts/ldap.md)
+
 # Servidors
 
 - [Desplegant un servidor web: Wordpress](./Servers/wordpress-mono/main.md)
