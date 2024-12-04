@@ -1,4 +1,4 @@
-# Gestió centralitzada d'usuaris amb LDAP
+# Gestió centralitzada d'usuaris utiltizant LDAP
 
 ## Requisits
 

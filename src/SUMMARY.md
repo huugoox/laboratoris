@@ -64,7 +64,7 @@
 
 # Gestió de comptes
 
-- [Lord of the system](./Accounts/lord.md)
+- [Gestió de Comptes](./Accounts/lord.md)
 - [LDAP](./Accounts/ldap.md)
 
 # Servidors

@@ -20,7 +20,7 @@ Aquest projecte esta dissenyat per ser **Open Source**. Això significa que **es
 
 ## Eines
 
-Aquest material s'ha creat utilitzant **mdbook** en la versió 0.4.37. Podeu trobar més informació sobre mdbook a [mdbook Documentation](https://rust-lang.github.io/mdBook/index.html). 
+Aquest material s'ha creat utilitzant **mdbook** en la versió 0.4.37. Podeu trobar més informació sobre mdbook a [mdbook Documentation](https://rust-lang.github.io/mdBook/index.html).
 
 ## Contribueix
 
