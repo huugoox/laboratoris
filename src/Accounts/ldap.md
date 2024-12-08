@@ -580,81 +580,56 @@ Per exemple:
 
 ## Exercicis
 
-1. Configura la base de dades **middlearth** amb els usuaris i grups creats a l'exercici anterior.
+- Configura la base de dades **middlearth** amb els usuaris i grups creats a l'exercici anterior.
 
-    - Crea un fitxer anomenat *middleearth.ldif* que contingui la configuració necessària per a la base de dades.
-    - Carrega aquesta configuració al servidor LDAP mitjançant eines com ldapadd o ldapmodify.
+  - Crea un fitxer anomenat *middleearth.ldif* que contingui la configuració necessària per a la base de dades.
+  - Carrega aquesta configuració al servidor LDAP mitjançant eines com ldapadd o ldapmodify.
 
+```bash
+BASE="dc=amsa,dc=udl,dc=cat"
+groups=("hobbits" "elfs" "nans" "mags")
+gids=("6000" "7000" "8000" "9000")
 
-    ```bash
-    BASE="dc=middleearth,dc=udl,dc=cat"
-    DC="middleearth"
+for (( j=0; j<${#groups[@]}; j++ ));
+do
+cat << EOL >> middleearth.ldif
+dn: cn=${groups[$j]},ou=groups,$BASE
+objectClass: posixGroup
+cn: ${groups[$j]}
+gidNumber: ${gids[$j]}
 
-    cat << EOL >> middleearth.ldif
-    dn: $BASE
-    objectClass: dcObject
-    objectClass: organization
-    objectClass: top
-    o: Middle Earth
-    dc: $DC
+EOL
+done
+```
 
-    dn: ou=groups,$BASE
-    objectClass: organizationalUnit
-    objectClass: top
-    ou: groups
+   ```bash
+groups=("hobbits" "elfs" "nans" "mags")
+gids=("6000" "7000" "8000" "9000")
+users=("frodo" "gollum" "samwise" "legolas" "gimli" "gandalf")
+b2g=("hobbits","hobbits","hobbits","elfs","nans","mags")
+sn=("baggins" "smeagol" "gamgee" "greenleaf" "sonofgloin" "thegrey")
+uids=("6001" "6002" "6003" "7001" "8001" "9001")
 
-    dn: ou=users,$BASE
-    objectClass: organizationalUnit
-    objectClass: top
-    ou: users
-    
-    dn: ou=system,$BASE
-    objectClass: organizationalUnit
-    objectClass: top
-    ou: system
-    EOL
+for (( j=0; j<${#users[@]}; j++ ))
+do
+cat << EOL >> users.ldif
+dn: uid=${users[$j]},ou=users,$BASE
+objectClass: posixAccount
+objectClass: shadowAccount
+objectClass: inetOrgPerson
+cn: ${users[$j]}
+sn: ${sn[$j]}
+uidNumber: ${uids[$j]}
+gidNumber: ${b2g[$j]}
+homeDirectory: /home/${users[$j]}
+loginShell: /bin/sh
+EOL
+done
+```
 
-    ldapadd -Y EXTERNAL -H ldapi:/// -f middleearth.ldif
-    ```
+- Configura una altra instància EC2 com a client LDAP.
 
-    ```bash
-    groups=("hobbits" "elfs" "nans" "mags")
-    gids=("6000" "7000" "8000" "9000")
-    users=("frodo" "gollum" "samwise" "legolas" "gimli" "gandalf")
-    b2g=("hobbits","hobbits","hobbits","elfs","nans","mags")
-    sn=("baggins" "smeagol" "gamgee" "greenleaf" "sonofgloin" "thegrey")
-    uids=("6001" "6002" "6003" "7001" "8001" "9001")
-
-    for (( j=0; j<${#groups[@]}; j++ ))
-    do
-    cat << EOL >> users.ldif
-    dn: cn=${groups[$j]},ou=groups,$BASE
-    objectClass: posixGroup
-    cn: ${groups[$j]}
-    gidNumber: ${gids[$j]}
-    EOL
-    done
-
-    for (( j=0; j<${#users[@]}; j++ ))
-    do
-    cat << EOL >> users.ldif
-    dn: uid=${users[$j]},ou=users,$BASE
-    objectClass: posixAccount
-    objectClass: shadowAccount
-    objectClass: inetOrgPerson
-    cn: ${users[$j]}
-    sn: ${sn[$j]}
-    uidNumber: ${uids[$j]}
-    gidNumber: ${b2g[$j]}
-    homeDirectory: /home/${users[$j]}
-    loginShell: /bin/sh
-    EOL
-    done
-    ```
-
-2. Configura una altra instància EC2 com a client LDAP.
-
-   - Assegura't que aquesta màquina autentiqui els usuaris i grups de Linux mitjançant el servidor LDAP configurat prèviament.
+  - Assegura't que aquesta màquina autentiqui els usuaris i grups de Linux mitjançant el servidor LDAP configurat prèviament.
 
     Per configurar els nostres clients podem utilitzar un script que ens faciliti la tasca. Aquest script ens permetrà configurar el client LDAP amb les dades del servidor LDAP.
 
@@ -787,10 +762,10 @@ Per exemple:
     drwxr-xr-x.  2 jordi programadors   6 Sep 26 18:36 jordi
     ```
 
-3. Instal·la i configura un client web per gestionar LDAP. Pots utilitzar l'eina [LAM](https://ldap-account-manager.org/lamcms/).
+- Instal·la i configura un client web per gestionar LDAP. Pots utilitzar l'eina [LAM](https://ldap-account-manager.org/lamcms/).
 
-    - Instal·la LDAP Account Manager (LAM) a la instància del servidor LDAP.
-    - Configura l'eina perquè es connecti al servidor LDAP i permeti la gestió dels usuaris i grups de manera visual utilitzant una interfície web.
+  - Instal·la LDAP Account Manager (LAM) a la instància del servidor LDAP.
+  - Configura l'eina perquè es connecti al servidor LDAP i permeti la gestió dels usuaris i grups de manera visual utilitzant una interfície web.
 
     Per instal·lar LAM, primer cal instal·lar les dependències necessàries:
 
