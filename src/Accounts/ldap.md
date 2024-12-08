@@ -584,12 +584,250 @@ Per exemple:
 
     - Crea un fitxer anomenat *middleearth.ldif* que contingui la configuració necessària per a la base de dades.
     - Carrega aquesta configuració al servidor LDAP mitjançant eines com ldapadd o ldapmodify.
-  
+
+
+    ```bash
+    BASE="dc=middleearth,dc=udl,dc=cat"
+    DC="middleearth"
+
+    cat << EOL >> middleearth.ldif
+    dn: $BASE
+    objectClass: dcObject
+    objectClass: organization
+    objectClass: top
+    o: Middle Earth
+    dc: $DC
+
+    dn: ou=groups,$BASE
+    objectClass: organizationalUnit
+    objectClass: top
+    ou: groups
+
+    dn: ou=users,$BASE
+    objectClass: organizationalUnit
+    objectClass: top
+    ou: users
+    
+    dn: ou=system,$BASE
+    objectClass: organizationalUnit
+    objectClass: top
+    ou: system
+    EOL
+
+    ldapadd -Y EXTERNAL -H ldapi:/// -f middleearth.ldif
+    ```
+
+    ```bash
+    groups=("hobbits" "elfs" "nans" "mags")
+    gids=("6000" "7000" "8000" "9000")
+    users=("frodo" "gollum" "samwise" "legolas" "gimli" "gandalf")
+    b2g=("hobbits","hobbits","hobbits","elfs","nans","mags")
+    sn=("baggins" "smeagol" "gamgee" "greenleaf" "sonofgloin" "thegrey")
+    uids=("6001" "6002" "6003" "7001" "8001" "9001")
+
+    for (( j=0; j<${#groups[@]}; j++ ))
+    do
+    cat << EOL >> users.ldif
+    dn: cn=${groups[$j]},ou=groups,$BASE
+    objectClass: posixGroup
+    cn: ${groups[$j]}
+    gidNumber: ${gids[$j]}
+    EOL
+    done
+
+    for (( j=0; j<${#users[@]}; j++ ))
+    do
+    cat << EOL >> users.ldif
+    dn: uid=${users[$j]},ou=users,$BASE
+    objectClass: posixAccount
+    objectClass: shadowAccount
+    objectClass: inetOrgPerson
+    cn: ${users[$j]}
+    sn: ${sn[$j]}
+    uidNumber: ${uids[$j]}
+    gidNumber: ${b2g[$j]}
+    homeDirectory: /home/${users[$j]}
+    loginShell: /bin/sh
+    EOL
+    done
+    ```
+
 2. Configura una altra instància EC2 com a client LDAP.
 
    - Assegura't que aquesta màquina autentiqui els usuaris i grups de Linux mitjançant el servidor LDAP configurat prèviament.
+
+    Per configurar els nostres clients podem utilitzar un script que ens faciliti la tasca. Aquest script ens permetrà configurar el client LDAP amb les dades del servidor LDAP.
+
+    Únicament caldrà modificar les variables `LDAP_SERVER` i `BASE` amb les dades del servidor LDAP. En el nostre cas, LDAP_SERVER ha de coincidir amb el DNS públic de la instància del servidor LDAP i BASE amb el nom de la base de dades que hem creat en el nostre cas `dc=amsa,dc=udl,dc=cat`. A més, caldrà copiar el fitxer `cacert.crt` del servidor LDAP al client.
+
+    Per fer-ho, copieu el contingut del fitxer `/etc/pki/tls/cacerts.pem` del servidor LDAP al client i deseu-lo com a `/etc/pki/tls/cacert.crt`.
+
+    ```bash
+    # Al servidor
+    sudo cat /etc/pki/tls/cacerts.pem
+
+    # Al client
+    sudo vi "/etc/pki/tls/cacert.crt"
+    ```
+
+    ```bash
+
+    echo "This script will configure the client to connect to the LDAP server"
+
+    echo "... Did you copy the cacert.crt from the server to the client? (y/n)?"
+
+    read -r response
+
+    if [ "$response" != "y" ]; then
+        echo "Exiting..."
+        exit 1
+    fi
+
+    # Variables
+    LDAP_SERVER="ec2-44-206-252-61.compute-1.amazonaws.com"
+    BASE="dc=amsa,dc=udl,dc=cat"
+    PATH_PKI="/etc/pki/tls"
+
+    echo "... Setting the hostname to $LDAP_SERVER"
+    echo "... Setting the base to $BASE"
+    echo "... Setting the path to $PATH_PKI"
+
+    echo "... Are you sure you want to continue? (y/n), are this values correct?"
+
+    read -r response
+
+    if [ "$response" != "y" ]; then
+        echo "Exiting..."
+        exit 1
+    fi
+
+    echo "... Install deps and tools"
+
+    dnf install openldap-clients sssd sssd-tools oddjob-mkhomedir -y
+
+    echo "... Configuring sssd"
+
+    cat << EOL >> /etc/sssd/sssd.conf
+    [sssd]
+    services = nss, pam, sudo
+    config_file_version = 2
+    domains = default
+
+    [sudo]
+
+    [nss]
+
+    [pam]
+    offline_credentials_expiration = 60
+
+    [domain/default]
+    ldap_id_use_start_tls = True
+    cache_credentials = True
+    ldap_search_base = $BASE
+    id_provider = ldap
+    auth_provider = ldap
+    chpass_provider = ldap
+    access_provider = ldap
+    sudo_provider = ldap
+    ldap_uri = ldaps://$LDAP_SERVER
+    ldap_default_bind_dn = cn=osproxy,ou=system,$BASE
+    ldap_group_search_base = ou=groups,$BASE
+    ldap_user_search_base = ou=users,$BASE
+    ldap_default_authtok = 1234
+    ldap_tls_reqcert = demand
+    ldap_tls_cacert = $PATH_PKI/cacert.crt
+    ldap_tls_cacertdir = $PATH_PKI
+    ldap_search_timeout = 50
+    ldap_network_timeout = 60
+    ldap_access_order = filter
+    ldap_access_filter = (objectClass=posixAccount)
+    EOL
+
+    echo "... Configuring ldap.conf"
+
+    echo "BASE $BASE" >> /etc/openldap/ldap.conf
+    echo "URI ldaps://$LDAP_SERVER" >> /etc/openldap/ldap.conf
+    echo "TLS_CACERT      $PATH_PKI/cacert.crt" >> /etc/openldap/ldap.conf
+    authselect select sssd --force
+
+    # Oddjob is a helper service that creates home directories for users the first time they log in
+
+    echo "... Configuring oddjob"
+    systemctl enable --now oddjobd
+    echo "session optional pam_oddjob_mkhomedir.so skel=/etc/skel/ umask=0022" >> /etc/pam.d/system-auth 
+    systemctl restart oddjobd
+
+    echo "... Setting permissions"
+
+    chown -R root: /etc/sssd
+    chmod 600 -R /etc/sssd
+
+    echo "... Starting sssd"
+
+    systemctl enable --now sssd
+
+    echo "... Done"
+    ```
+
+    Aquest script configura el client LDAP per connectar-se al servidor LDAP. Per fer-ho, instal·la les eines necessàries, com ara `openldap-clients`, `sssd`, `sssd-tools` i `oddjob-mkhomedir`. A continuació, configura el fitxer `sssd.conf` amb les dades del servidor LDAP i el fitxer `ldap.conf` amb les dades de connexió al servidor LDAP. Finalment, configura el servei `oddjobd` per crear els directoris d'inici dels usuaris la primera vegada que inicien sessió. Podeu trobar el script a [ldapclient.sh](src/ldapclient.sh).
+
+    Per testar la configuració del client crearem un directori **/home/jordi** i l'assignarem a un usuari i a un grup inicialitzat a LDAP.
+
+    ```bash
+    sudo mkdir /home/jordi
+    sudo chown 4000:5000 /home/jordi
+    ```
+
+    > Nota: L'usuari jordi no és un usuari local, sinó un usuari definit a LDAP. Per tant, si LDAP no està configurat correctament, veurem el valors numèrics 4000 i 5000 en lloc del nom de l'usuari i el grup.
+
+    En canvi, si tot està configurat correctament, veurem el nom de l'usuari i el grup corresponents a aquests valors numèrics definits a LDAP.
+
+    ```bash
+    sudo ls -l /home
+    drwxr-xr-x.  2 jordi programadors   6 Sep 26 18:36 jordi
+    ```
 
 3. Instal·la i configura un client web per gestionar LDAP. Pots utilitzar l'eina [LAM](https://ldap-account-manager.org/lamcms/).
 
     - Instal·la LDAP Account Manager (LAM) a la instància del servidor LDAP.
     - Configura l'eina perquè es connecti al servidor LDAP i permeti la gestió dels usuaris i grups de manera visual utilitzant una interfície web.
+
+    Per instal·lar LAM, primer cal instal·lar les dependències necessàries:
+
+    ```bash
+    sudo dnf install -y httpd php php-ldap php-mbstring php-gd php-gmp php-zip
+    sudo systemctl enable --now httpd
+    ```
+
+    A continuació, descarrega i descomprimeix el paquet de LAM:
+
+    ```bash
+    sudo wget https://github.com/LDAPAccountManager/lam/releases/download/9.0.RC1/ldap-account-manager-9.0.RC1-0.fedora.1.noarch.rpm
+    sudo dnf install ldap-account-manager-9.0.RC1-0.fedora.1.noarch.rpm
+    ```
+
+    Finalment, navega a la pàgina web de LAM a `http://<IP_SERVER>/lam` i segueix les instruccions per configurar la connexió al servidor LDAP. En el meu cas, he configurat la connexió al servidor LDAP amb les dades següents: `http://ec2-34-207-89-93.compute-1.amazonaws.com/lam`.
+
+    ![LAM](./figs/lam/lam-01.png)
+
+    Per configurar l'usuari per accedir a LAM, utilitzarem l'usuari `osproxy` que hem creat anteriorment. Aquest usuari té permisos per gestionar la base de dades LDAP. Per fer-ho, anem a **LAM Configuration**.
+
+    ![LAM](./figs/lam/lam-02.png)
+
+    Editeu **General Settings** i us identifiqueu amb l'usuari per defecte, i la contrasenya `lam`. En aquest punt, modifiqueu la contrasenya per una més segura, per exemple, `@ms@22o4G3i`.
+
+    ![LAM](./figs/lam/lam-03.png)
+
+    Editeu **Server Profiles** dins de **LAM Configuration** i modifiqueu el perfil perquè s'identifiqui amb l'usuari `osproxy` i la contrasenya que heu definit anteriorment. La contrasenya per defecte és `lam`. Us recomano que la modifiqueu per una més segura com per exemple `@ms@22o4G3i-s3rv3rPr0f1l3`.
+
+    - General Settings:
+      - Server Address: `ldaps://ec2-44-206-252-61.compute-1.amazonaws.com:636` o bé si esteu utilitzant el vostre servidor LDAP, `ldap://localhost:389`.
+      - List of Valid Users: `cn=osproxy,ou=system,dc=amsa,dc=udl,dc=cat`.
+      - Tree suffix: `dc=amsa,dc=udl,dc=cat`.
+    - Account Types:
+      - Users: `ou=users,dc=amsa,dc=udl,dc=cat`.
+      - Groups: `ou=groups,dc=amsa,dc=udl,dc=cat`.
+
+    Si tot ha anat bé, hauríeu de poder accedir a LAM amb l'usuari `osproxy` i gestionar els usuaris i grups de la base de dades LDAP.
+
+    ![LAM](./figs/lam/lam-04.png)
