@@ -83,6 +83,7 @@
 
 # Contenidors
  - [Docker](./Containers/docker.md)
+ - [Exercicis](./Containers/exercises.md)
 
   
 # AWS
