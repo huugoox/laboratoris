@@ -424,8 +424,6 @@ En aquesta configuració el servei MongoDB és gestionat per un contenidor però
     ls -la /opt/mongodb/data
     ```
 
-### Vincles
-
 Els vincles ofereixen una altra opció per accedir a fitxers del sistema host des dins d'un contenidor. Aquesta opció és especialment útil quan necessitem accedir a fitxers específics del sistema host, com ara sistemes de fitxers compartits.
 
 Per exemple, en el cas de la base de dades MongoDB, podem tenir vincles a fitxers de configuració específics del sistema host. Això ens permetrà configurar la base de dades des del sistema host.
@@ -438,70 +436,7 @@ docker run -d --name mongodb \
     mongo:4 --config /etc/mongo.conf
 ```
 
-El ftixer /path/to/mongo.conf conté la configuració de MongoDB. Aquest fitxer es troba al sistema host i es vincula al contenidor. Això permet que el fitxer de configuració es mantingui al sistema host i no es perdi quan el contenidor es deté o s'elimina.
-
-### Emmagatzematge temporal amb tmpfs
-
-Aquesta opció  permet crear un sistema de fitxers temporal en memòria volàtil dins del contenidor. Això és útil per emmagatzemar dades que no necessiten persistir més enllà del cicle de vida del contenidor i que es poden perdre en cas de reinici o apagament del sistema host.
-
-És a dir permeten als usuaris emmagatzemar dades temporalment en la memòria RAM, no en l'emmagatzematge de l'amfitrió (a través de vincles o volums) ni en la capa d'escriptura del contenidor (amb l'ajuda dels controladors d'emmagatzematge). Quan el contenidor s'atura, el montatge tmpfs s'eliminarà i les dades no es persistiran en cap emmagatzematge.
-
-Això és ideal per accedir a credencials o informació sensible des del punt de vista de la seguretat. L'inconvenient és que un montatge tmpfs no es pot compartir entre contenidors.
-
-Per a crear un contenidor amb un montatge tmpfs, utilitzarem l'opció **--mount** amb la següent sintaxi:
-
-```bash
-docker run -d --name <nom_contenidor> --mount type=tmpfs,destination=<directori>,tmpfs-size=<mida> <nom_imatge>
-```
-
-on:
-
-- **type**: indica el tipus de montatge. En aquest cas, tmpfs.
-- **destination**: indica el directori del contenidor on es muntarà el tmpfs.
-- **tmpfs-size**: indica la mida del tmpfs. Per defecte, 100MB.
-
-Per exemple:
-
-1. Crearem un fitxer de credencials:
-
-    ```bash
-    mkdir -p /tmp/credentials
-    cat << EOF > /tmp/credentials/credentials.txt
-    username: admin
-    password: admin
-    EOF
-    ```
-
-2. Crearem un contenidor amb un montatge tmpfs:
-
-    ```bash
-    docker run -d --name secure-container \
-    --mount type=tmpfs,destination=/credentials,readonly \
-    -v /tmp/credentials/credentials.txt:/credentials/credentials.txt \
-    alpine:latest sh -c "cat /credentials/credentials.txt; sleep infinity"
-    ```
-
-3. Comprovarem que el fitxer de credencials s'ha creat correctament:
-
-    ```bash
-    docker exec -it secure-container cat /credentials/credentials.txt
-    ```
-
-4. Aturarem  i elimineu el contenidor:
-
-    ```bash
-    docker stop secure-container
-    docker rm secure-container
-    ```
-
-5. Tornem a crear el contenidor:
-
-    ```bash
-    docker run -d --name secure-container \
-    alpine:latest sh -c "cat /credentials/credentials.txt; sleep infinity"
-    ```
-
-Ara el fitxer de credencials no existeix. Això és degut a que el fitxer de credencials s'ha creat en un montatge tmpfs i s'ha perdut quan el contenidor s'ha aturat i eliminat.
+El ftixer `/path/to/mongo.conf` conté la configuració de MongoDB. Aquest fitxer es troba al sistema host i es vincula al contenidor. Això permet que el fitxer de configuració es mantingui al sistema host i no es perdi quan el contenidor es deté o s'elimina.
 
 ### Controladors d'emmagatzematge
 
