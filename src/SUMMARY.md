@@ -84,6 +84,7 @@
 # Contenidors
  - [Docker](./Containers/docker.md)
  - [Exercicis](./Containers/exercises.md)
+ - [Dockeritzant NGINX](./Containers/nginx.md)
 
   
 # AWS
