@@ -113,7 +113,7 @@ services:
 
 - Inicialment hem configurat `nginx` de la següent manera:
 
-```plaintext
+```nginx
 events {}
 http {
         server {
