@@ -164,27 +164,27 @@ Si volem automatitzar aquest procés, podem utilitzar AWS Lambda per a processar
         CMD [ "lambda_function.handler" ]
         ```
 
-1. Construeix la imatge amb la comanda:
+4. Construeix la imatge amb la comanda:
 
     ```bash
     docker build -t cell-counting .
     ```
 
-2. Crea un repositori ECR amb el nom `cell-counting`.
+5. Crea un repositori ECR amb el nom `cell-counting`.
 
-3. Inicia sessió a ECR amb la comanda:
+6. Inicia sessió a ECR amb la comanda:
 
     ```bash
     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <id>.dkr.ecr.us-east-1.amazonaws.com
     ```
 
-4. Etiqueta la imatge amb la comanda:
+7. Etiqueta la imatge amb la comanda:
 
     ```bash
     docker tag cell-counting:latest <id>.dkr.ecr.us-east-1.amazonaws.com/cell-counting:latest
     ```
 
-5. Puja la imatge a ECR amb la comanda:
+8. Puja la imatge a ECR amb la comanda:
 
     ```bash
     docker push <id>.dkr.ecr.us-east-1.amazonaws.com/cell-counting:latest
@@ -192,17 +192,16 @@ Si volem automatitzar aquest procés, podem utilitzar AWS Lambda per a processar
 
     > **Nota**: AWS us indicarà dels passos 6, 7 i 8 la comanda exacta a executar.
 
-6. Creació de la funció Lambda:
+9. Creació de la funció Lambda:
 
    - Ves al servei Lambda.
    - Clica **Crea funció** i selecciona **Imatge de contenidor**.
    - Configura:
         - *Nom de la funció*: cell-counting.
         - *URI de la imatge del contenidor*: Selecciona la imatge cell-counting d'ECR.
-        - *Arquitectura*: arm64.
         - *Rol d'execució*: Utilitza un rol com **LabRole** amb permisos S3.
   
-7.  Configura el disparador de la funció Lambda:
+10. Configura el disparador de la funció Lambda:
 
     - Clica a la funció cell-counting.
     - Clica a **Afegeix disparador**.
@@ -218,7 +217,7 @@ Si volem automatitzar aquest procés, podem utilitzar AWS Lambda per a processar
         - *Temps d'execució màxim*: 1 minut.
         - *Emmagatzematge temporal*: 512 MB.
 
-8.  Prova la funció Lambda:
+11. Prova la funció Lambda:
 
     - Puja una imatge al bucket `microscope-images-nom`.
     - Revisa el resultat al bucket `microscope-images-processed-nom`.
