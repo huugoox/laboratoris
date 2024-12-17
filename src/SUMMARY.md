@@ -86,7 +86,6 @@
  - [Exercicis](./Containers/exercises.md)
  - [Dockeritzant NGINX](./Containers/nginx.md)
 
-  
 # AWS
   - [AWS S3](./AWS/s3.md)
   - [AWS Networking](./AWS/xarxa.md)
@@ -99,3 +98,4 @@
     - [Wordpress](./AWS/wordpress/wordpress.md)
     - [Balancejador de càrrega](./AWS/wordpress/loadbalancer.md)
     - [Configuració VPN](./AWS/wordpress/vpn.md)
+  - [AWS Lambda](./AWS/lambda.md)
