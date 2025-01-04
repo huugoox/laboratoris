@@ -1,6 +1,6 @@
 # Configuració VPN
 
-En aquest punt, la vostra arquitectura permet als usuaris des de l'exterior a través d'interent mitjançant:
+En aquest punt, la vostra arquitectura permet als usuaris des de l'exterior a través d'internet mitjançant:
 
 - El DNS públic del Load Balancer d'aplicacions (ALB) que redirigeix el tràfic HTTP i HTTPS a les instàncies EC2.
 - El DNS públic de les instancies EC2 que despleguen el servei de WordPress.
